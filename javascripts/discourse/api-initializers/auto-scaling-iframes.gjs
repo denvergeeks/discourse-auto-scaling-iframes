@@ -105,8 +105,8 @@ function updateScaledIframe(wrapper, iframe) {
   const aspectRatio = getAspectRatio();
 
   const scale = Math.min(1, wrapperWidth / desktopWidth);
-  const iframeWidth = desktopWidth;
-  const iframeHeight = desktopWidth * aspectRatio;
+  const iframeWidth = desktopWidth / scale;
+  const iframeHeight = desktopWidth * aspectRatio / scale;
   const wrapperHeight = iframeHeight * scale;
 
   wrapper.style.height = `${wrapperHeight}px`;
