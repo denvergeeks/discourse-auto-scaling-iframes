@@ -1,12 +1,23 @@
 /* DISCOURSE AUTO-SCALING IFRAMES */
 
-iframe.scaling {
-  display: block;
+.cooked .autoscale-iframe-wrap {
+  --autoscale-factor: 1;
+
+  position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  overflow: hidden;
+  line-height: 0;
   border: 1px solid #666;
   box-sizing: border-box;
-  transform-origin: center top;
-  transition: transform 0.05s linear;
-  backface-visibility: hidden;
+}
+
+.cooked .autoscale-iframe {
+  display: block;
+  margin: 0;
+  border: 0;
+  max-width: none;
+  transform: scale(var(--autoscale-factor));
+  transform-origin: top left;
+  will-change: transform;
 }
