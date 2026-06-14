@@ -1,12 +1,19 @@
 import { apiInitializer } from "discourse/lib/api";
 
-const DESKTOP_WIDTH = 1440;
-const ASPECT_RATIO = 9 / 16;
-
 const resizeObservers = new WeakMap();
 
 function isAutoscaleText(value) {
   return value?.trim() === "{autoscale}";
+}
+
+function getDesktopWidth() {
+  return Math.max(320, Number(settings.desktop_width) || 1440);
+}
+
+function getAspectRatio() {
+  const width = Math.max(1, Number(settings.aspect_ratio_width) || 16);
+  const height = Math.max(1, Number(settings.aspect_ratio_height) || 9);
+  return height / width;
 }
 
 function consumeAutoscaleMarker(iframe) {
@@ -75,9 +82,12 @@ function updateScaledIframe(wrapper, iframe) {
     return;
   }
 
-  const scale = Math.min(1, wrapperWidth / DESKTOP_WIDTH);
-  const iframeWidth = DESKTOP_WIDTH;
-  const iframeHeight = DESKTOP_WIDTH * ASPECT_RATIO;
+  const desktopWidth = getDesktopWidth();
+  const aspectRatio = getAspectRatio();
+
+  const scale = Math.min(1, wrapperWidth / desktopWidth);
+  const iframeWidth = desktopWidth;
+  const iframeHeight = desktopWidth * aspectRatio;
   const wrapperHeight = iframeHeight * scale;
 
   wrapper.style.height = `${wrapperHeight}px`;
