@@ -2,6 +2,13 @@ import { apiInitializer } from "discourse/lib/api";
 
 export default apiInitializer((api) => {
 
+
+  api.decorateCookedElement(
+    (cooked) => {
+          iframe.classList.add("scaling");
+          return;
+        }
+
 (function (win, doc) {
 
   var BREAKPOINT = 2030;
@@ -13,7 +20,7 @@ export default apiInitializer((api) => {
   var iframe = doc.getElementsByTagName('iframe')[0],
       timestamp = 0;
 
-  IFRAME_HEIGHT = parseInt(getComputedStyle(iframe.scaling).height, 10);
+  IFRAME_HEIGHT = parseInt(getComputedStyle(iframe).height, 10);
 
   function transformStr(obj) {
     var obj = obj || {},
@@ -65,5 +72,11 @@ export default apiInitializer((api) => {
   win.addEventListener('resize', onResize(), false);
 
 })(window.self, document);
+
+      });
+    },
+  );
+
+
 
 });
