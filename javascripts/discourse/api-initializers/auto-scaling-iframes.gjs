@@ -1,19 +1,9 @@
 import { apiInitializer } from "discourse/lib/api";
 
-const BREAKPOINT = 2030;
-const THROTTLE = 30;
+const DESKTOP_WIDTH = 1440;
+const ASPECT_RATIO = 9 / 16;
 
-function transformStr(obj) {
-  let val = "";
-
-  for (const key in obj) {
-    val += `${key}(${obj[key]}) `;
-  }
-
-  val += "translateZ(0)";
-
-  return `-webkit-transform: ${val}; -moz-transform: ${val}; transform: ${val}`;
-}
+const resizeObservers = new WeakMap();
 
 function isAutoscaleText(value) {
   return value?.trim() === "{autoscale}";
@@ -62,66 +52,74 @@ function consumeAutoscaleMarker(iframe) {
   return false;
 }
 
-function applyScaling(iframe) {
-  let timestamp = 0;
-
-  function resetInlineStyles() {
-    iframe.style.removeProperty("transform");
-    iframe.style.removeProperty("-webkit-transform");
-    iframe.style.removeProperty("-moz-transform");
-    iframe.style.removeProperty("width");
-    iframe.style.removeProperty("height");
+function wrapIframe(iframe) {
+  if (iframe.parentElement?.classList.contains("autoscale-iframe-wrap")) {
+    return iframe.parentElement;
   }
 
-  function onResize() {
-    const now = Date.now();
-    const cooked = iframe.closest(".cooked");
-    const cookedWidth = cooked?.clientWidth;
+  const wrapper = document.createElement("div");
+  wrapper.className = "autoscale-iframe-wrap";
 
-    if (now - timestamp < THROTTLE) {
-      return;
-    }
+  iframe.classList.add("autoscale-iframe");
 
-    timestamp = now;
+  iframe.parentNode.insertBefore(wrapper, iframe);
+  wrapper.appendChild(iframe);
 
-    if (!cookedWidth) {
-      return;
-    }
+  return wrapper;
+}
 
-    if (cookedWidth >= BREAKPOINT) {
-      resetInlineStyles();
-      return;
-    }
+function updateScaledIframe(wrapper, iframe) {
+  const wrapperWidth = wrapper.clientWidth;
 
-    const scale = Math.pow(cookedWidth / BREAKPOINT, 1.2);
-    const width = 100 / scale;
-    const baseHeight = cookedWidth * (9 / 16);
-    const height = baseHeight / scale;
-    const offsetLeft = (width - 100) / 2;
-
-    iframe.setAttribute(
-      "style",
-      `${transformStr({
-        scale,
-        translateX: `-${offsetLeft}%`,
-      })}; width: ${width}%; height: ${height}px;`
-    );
+  if (!wrapperWidth) {
+    return;
   }
 
-  window.addEventListener("resize", onResize, false);
-  requestAnimationFrame(onResize);
+  const scale = Math.min(1, wrapperWidth / DESKTOP_WIDTH);
+  const iframeWidth = DESKTOP_WIDTH;
+  const iframeHeight = DESKTOP_WIDTH * ASPECT_RATIO;
+  const wrapperHeight = iframeHeight * scale;
+
+  wrapper.style.height = `${wrapperHeight}px`;
+  wrapper.style.setProperty("--autoscale-factor", scale);
+
+  iframe.style.width = `${iframeWidth}px`;
+  iframe.style.height = `${iframeHeight}px`;
+}
+
+function attachScaling(wrapper, iframe) {
+  if (resizeObservers.has(wrapper)) {
+    updateScaledIframe(wrapper, iframe);
+    return;
+  }
+
+  const resizeObserver = new ResizeObserver(() => {
+    updateScaledIframe(wrapper, iframe);
+  });
+
+  resizeObserver.observe(wrapper);
+  resizeObservers.set(wrapper, resizeObserver);
+
+  updateScaledIframe(wrapper, iframe);
 }
 
 export default apiInitializer((api) => {
   api.decorateCookedElement(
     (cooked) => {
       cooked.querySelectorAll("iframe").forEach((iframe) => {
+        if (
+          iframe.classList.contains("autoscale-iframe") ||
+          iframe.parentElement?.classList.contains("autoscale-iframe-wrap")
+        ) {
+          return;
+        }
+
         if (!consumeAutoscaleMarker(iframe)) {
           return;
         }
 
-        iframe.classList.add("scaling");
-        applyScaling(iframe);
+        const wrapper = wrapIframe(iframe);
+        attachScaling(wrapper, iframe);
       });
     },
     { id: "auto-scaling-iframes" }
