@@ -59,19 +59,37 @@ function consumeAutoscaleMarker(iframe) {
   return false;
 }
 
+function unwrapResponsiveIframe(iframe) {
+  const responsiveWrap = iframe.parentElement;
+
+  if (!responsiveWrap?.classList.contains("responsive-iframe-wrap")) {
+    return iframe;
+  }
+
+  const parent = responsiveWrap.parentNode;
+  parent.insertBefore(iframe, responsiveWrap);
+  responsiveWrap.remove();
+
+  iframe.classList.remove("responsive-iframe");
+
+  return iframe;
+}
+
 function wrapIframe(iframe) {
   if (iframe.parentElement?.classList.contains("autoscale-iframe-wrap")) {
     return iframe.parentElement;
   }
 
+  const cleanIframe = unwrapResponsiveIframe(iframe);
+
   const wrapper = document.createElement("div");
   wrapper.className = "autoscale-iframe-wrap";
 
-  iframe.classList.remove("responsive-iframe");
-  iframe.classList.add("autoscale-iframe");
+  cleanIframe.classList.remove("responsive-iframe");
+  cleanIframe.classList.add("autoscale-iframe");
 
-  iframe.parentNode.insertBefore(wrapper, iframe);
-  wrapper.appendChild(iframe);
+  cleanIframe.parentNode.insertBefore(wrapper, cleanIframe);
+  wrapper.appendChild(cleanIframe);
 
   return wrapper;
 }
@@ -96,6 +114,8 @@ function updateScaledIframe(wrapper, iframe) {
 
   iframe.style.width = `${iframeWidth}px`;
   iframe.style.height = `${iframeHeight}px`;
+  iframe.style.transform = `scale(${scale})`;
+  iframe.style.transformOrigin = "top left";
 }
 
 function attachScaling(wrapper, iframe) {
@@ -132,7 +152,13 @@ export default apiInitializer((api) => {
         }
 
         const wrapper = wrapIframe(iframe);
-        attachScaling(wrapper, iframe);
+        const autoscaleIframe = wrapper.querySelector("iframe");
+
+        if (!autoscaleIframe) {
+          return;
+        }
+
+        attachScaling(wrapper, autoscaleIframe);
       });
     },
     { id: "auto-scaling-iframes" }
