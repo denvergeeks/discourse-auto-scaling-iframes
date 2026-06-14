@@ -13,7 +13,7 @@ export default apiInitializer((api) => {
   var iframe = doc.getElementsByTagName('iframe')[0],
       timestamp = 0;
 
-  IFRAME_HEIGHT = parseInt(getComputedStyle(iframe).height, 10);
+  IFRAME_HEIGHT = parseInt(getComputedStyle(iframe.scaling).height, 10);
 
   function transformStr(obj) {
     var obj = obj || {},
