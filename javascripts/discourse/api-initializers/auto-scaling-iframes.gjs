@@ -10,10 +10,10 @@ function getDesktopWidth() {
   return Math.max(320, Number(settings.desktop_width) || 1440);
 }
 
-function getAspectRatio() {
+function getAspectRatioValues() {
   const width = Math.max(1, Number(settings.aspect_ratio_width) || 16);
   const height = Math.max(1, Number(settings.aspect_ratio_height) || 9);
-  return height / width;
+  return { width, height };
 }
 
 function consumeAutoscaleMarker(iframe) {
@@ -102,20 +102,30 @@ function updateScaledIframe(wrapper, iframe) {
   }
 
   const desktopWidth = getDesktopWidth();
-  const aspectRatio = getAspectRatio();
-  const scale = Math.min(1, wrapperWidth / desktopWidth);
+  const aspect = getAspectRatioValues();
+  const desktopHeight = desktopWidth * (aspect.height / aspect.width);
 
-  const visibleHeight = wrapperWidth * aspectRatio;
-  const compensatedWidth = wrapperWidth / scale;
-  const compensatedHeight = visibleHeight / scale;
+  if (wrapperWidth >= desktopWidth) {
+    wrapper.style.height = `${desktopHeight}px`;
+    iframe.style.width = "100%";
+    iframe.style.height = `${desktopHeight}px`;
+    iframe.style.transform = "";
+    iframe.style.transformOrigin = "";
+    return;
+  }
+
+  const scale = Math.pow(wrapperWidth / desktopWidth, 1.2);
+  const compensatedWidthPercent = 100 / scale;
+  const compensatedHeightPx = desktopHeight / scale;
+  const offsetLeftPercent = (compensatedWidthPercent - 100) / 2;
+  const visibleHeight = desktopHeight * scale;
 
   wrapper.style.height = `${visibleHeight}px`;
-  wrapper.style.setProperty("--autoscale-factor", scale);
 
-  iframe.style.width = `${compensatedWidth}px`;
-  iframe.style.height = `${compensatedHeight}px`;
-  iframe.style.transform = `scale(${scale})`;
-  iframe.style.transformOrigin = "top left";
+  iframe.style.width = `${compensatedWidthPercent}%`;
+  iframe.style.height = `${compensatedHeightPx}px`;
+  iframe.style.transform = `scale(${scale}) translateX(-${offsetLeftPercent}%)`;
+  iframe.style.transformOrigin = "center top";
 }
 
 function attachScaling(wrapper, iframe) {
