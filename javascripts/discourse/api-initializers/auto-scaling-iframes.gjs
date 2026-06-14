@@ -107,25 +107,24 @@ function updateScaledIframe(wrapper, iframe) {
 
   if (wrapperWidth >= desktopWidth) {
     wrapper.style.height = `${desktopHeight}px`;
-    iframe.style.width = "100%";
+    iframe.style.width = `${desktopWidth}px`;
     iframe.style.height = `${desktopHeight}px`;
-    iframe.style.transform = "";
-    iframe.style.transformOrigin = "";
+    iframe.style.transform = "none";
+    iframe.style.transformOrigin = "top left";
     return;
   }
 
-  const scale = Math.pow(wrapperWidth / desktopWidth, 1.2);
-  const compensatedWidthPercent = 100 / scale;
-  const compensatedHeightPx = desktopHeight / scale;
-  const offsetLeftPercent = (compensatedWidthPercent - 100) / 2;
-  const visibleHeight = desktopHeight * scale;
+  const scale = wrapperWidth / desktopWidth;
+  const visibleHeight = wrapperWidth * (aspect.height / aspect.width);
+  const compensatedWidth = desktopWidth / scale;
+  const compensatedHeight = desktopHeight / scale;
 
   wrapper.style.height = `${visibleHeight}px`;
 
-  iframe.style.width = `${compensatedWidthPercent}%`;
-  iframe.style.height = `${compensatedHeightPx}px`;
-  iframe.style.transform = `scale(${scale}) translateX(-${offsetLeftPercent}%)`;
-  iframe.style.transformOrigin = "center top";
+  iframe.style.width = `${compensatedWidth}px`;
+  iframe.style.height = `${compensatedHeight}px`;
+  iframe.style.transform = `scale(${scale})`;
+  iframe.style.transformOrigin = "top left";
 }
 
 function attachScaling(wrapper, iframe) {
