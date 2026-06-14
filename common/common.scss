@@ -1,33 +1,12 @@
-/* DISCOURSE RESPONSIVE IFRAMES */
+/* DISCOURSE AUTO-SCALING IFRAMES */
 
-/* Inside Topic Content (.cooked) */
-.cooked .responsive-iframe-wrap {
-  width: 100% !important;
-  max-width: 100% !important;
-  aspect-ratio: var(--iframe-ratio, 16 / 9) !important;
-  position: relative !important;
-  overflow: hidden !important;
+iframe.scaling {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  border: 1px solid #666;
+  box-sizing: border-box;
+  transform-origin: center top;
+  transition: transform .05s linear;
+  backface-visibility: hidden;
 }
-
-/*
-
-.cooked .responsive-iframe {
-  display: block !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 100% !important;
-  border: 0 !important;
-  box-sizing: border-box !important;
-}
-
-*/
-
-/* Inside Float Kit Tooltips */
-  iframe {
-    display: block !important;
-    width: 100% !important;
-    margin: 0 !important;
-    width: min(90vw, 700px) !important;
-    aspect-ratio: var(--iframe-ratio, 16 / 9) !important;
-    border: 0 !important;
-  }
