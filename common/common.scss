@@ -12,11 +12,15 @@
   box-sizing: border-box;
 }
 
-.cooked .autoscale-iframe {
+.cooked .autoscale-iframe-wrap > iframe.autoscale-iframe,
+.cooked .autoscale-iframe-wrap > iframe.autoscale-iframe.responsive-iframe {
   display: block;
   margin: 0;
   border: 0;
   max-width: none;
+  width: auto;
+  height: auto;
+  aspect-ratio: auto;
   transform: scale(var(--autoscale-factor));
   transform-origin: top left;
   will-change: transform;
