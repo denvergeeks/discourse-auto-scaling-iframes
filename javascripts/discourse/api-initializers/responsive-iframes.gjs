@@ -1,37 +1,69 @@
 import { apiInitializer } from "discourse/lib/api";
 
 export default apiInitializer((api) => {
-  api.decorateCookedElement(
-    (cooked) => {
-      cooked.querySelectorAll("iframe").forEach((iframe) => {
-        if (iframe.closest(".responsive-iframe-wrap")) {
-          return;
-        }
 
-        if (iframe.closest(".fk-d-tooltip__inner-content")) {
-          iframe.classList.add("responsive-iframe");
-          return;
-        }
+(function (win, doc) {
 
-        const wrapper = document.createElement("div");
-        wrapper.className = "responsive-iframe-wrap";
+  var BREAKPOINT = 2030;
 
-        const width = parseFloat(iframe.getAttribute("width"));
-        const height = parseFloat(iframe.getAttribute("height"));
+  var THROTTLE = 30;
+  
+  var IFRAME_HEIGHT;
 
-        if (width > 0 && height > 0) {
-          wrapper.style.setProperty("--iframe-ratio", `${width} / ${height}`);
-        } else {
-          wrapper.style.setProperty("--iframe-ratio", "16 / 9");
-        }
+  var iframe = doc.getElementsByTagName('iframe')[0],
+      timestamp = 0;
 
-        iframe.parentNode.insertBefore(wrapper, iframe);
-        wrapper.appendChild(iframe);
-        iframe.classList.add("responsive-iframe");
-        iframe.removeAttribute("width");
-        iframe.removeAttribute("height");
-      });
-    },
-    { id: "responsive-iframes", onlyStream: true }
-  );
+  IFRAME_HEIGHT = parseInt(getComputedStyle(iframe).height, 10);
+
+  function transformStr(obj) {
+    var obj = obj || {},
+        val = '',
+        j;
+    for ( j in obj ) {
+      val += j + '(' + obj[j] + ') ';
+    }
+    val += 'translateZ(0)';
+    return '-webkit-transform: ' + val + '; ' +
+            '-moz-transform: ' + val + '; ' +
+            'transform: ' + val;
+  }
+  
+  function onResize() {
+  
+    var now = +new Date,
+        winWidth = win.innerWidth,
+        noResizing = winWidth > BREAKPOINT,
+        scale,
+        width,
+        height,
+        offsetLeft;
+    
+    if ( now - timestamp < THROTTLE || noResizing ) {
+      noResizing && iframe.hasAttribute('style') && iframe.removeAttribute('style');
+      return onResize;
+    }
+    
+    timestamp = now;
+
+    scale = Math.pow(winWidth / BREAKPOINT, 1.2);
+
+    width = 100 / scale;
+
+    height = IFRAME_HEIGHT / scale;
+ 
+    offsetLeft = (width - 100) / 2;
+    
+    iframe.setAttribute('style', transformStr({
+      scale: scale,
+      translateX: '-' + offsetLeft + '%'
+    }) + '; width: ' + width + '%; ' + 'height: ' + height + 'px');
+    
+    return onResize;
+  
+  }
+  
+  win.addEventListener('resize', onResize(), false);
+
+})(window.self, document);
+
 });
