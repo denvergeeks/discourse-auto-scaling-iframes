@@ -1,8 +1,6 @@
 /* DISCOURSE AUTO-SCALING IFRAMES */
 
 .cooked .autoscale-iframe-wrap {
-  --autoscale-factor: 1;
-
   position: relative;
   width: 100%;
   max-width: 100%;
@@ -21,7 +19,5 @@
   width: auto;
   height: auto;
   aspect-ratio: auto;
-  transform: scale(var(--autoscale-factor));
-  transform-origin: top left;
   will-change: transform;
 }
