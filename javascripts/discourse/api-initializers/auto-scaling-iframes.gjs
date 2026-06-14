@@ -103,17 +103,17 @@ function updateScaledIframe(wrapper, iframe) {
 
   const desktopWidth = getDesktopWidth();
   const aspectRatio = getAspectRatio();
-
   const scale = Math.min(1, wrapperWidth / desktopWidth);
-  const iframeWidth = desktopWidth / scale;
-  const iframeHeight = desktopWidth * aspectRatio / scale;
-  const wrapperHeight = iframeHeight * scale;
 
-  wrapper.style.height = `${wrapperHeight}px`;
+  const visibleHeight = wrapperWidth * aspectRatio;
+  const compensatedWidth = wrapperWidth / scale;
+  const compensatedHeight = visibleHeight / scale;
+
+  wrapper.style.height = `${visibleHeight}px`;
   wrapper.style.setProperty("--autoscale-factor", scale);
 
-  iframe.style.width = `${iframeWidth}px`;
-  iframe.style.height = `${iframeHeight}px`;
+  iframe.style.width = `${compensatedWidth}px`;
+  iframe.style.height = `${compensatedHeight}px`;
   iframe.style.transform = `scale(${scale})`;
   iframe.style.transformOrigin = "top left";
 }
