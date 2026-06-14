@@ -8,7 +8,7 @@
   max-width: 100%;
   overflow: hidden;
   line-height: 0;
-  border: 1px solid #666;
+  border: #{$iframe_border};
   box-sizing: border-box;
 }
 
