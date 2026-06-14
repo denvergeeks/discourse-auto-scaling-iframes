@@ -64,8 +64,7 @@ function consumeAutoscaleMarker(iframe) {
 
 function applyScaling(iframe) {
   let timestamp = 0;
-  const baseWidth = BREAKPOINT;
-  const baseHeight = baseWidth * (9 / 16);
+  const container = iframe.closest(".cooked") || iframe.parentElement;
 
   function resetInlineStyles() {
     iframe.style.removeProperty("transform");
@@ -77,7 +76,6 @@ function applyScaling(iframe) {
 
   function onResize() {
     const now = Date.now();
-    const winWidth = window.innerWidth;
 
     if (now - timestamp < THROTTLE) {
       return;
@@ -85,20 +83,30 @@ function applyScaling(iframe) {
 
     timestamp = now;
 
-    if (winWidth > BREAKPOINT) {
+    const containerWidth = container?.clientWidth || iframe.parentElement?.clientWidth;
+
+    if (!containerWidth) {
+      return;
+    }
+
+    if (containerWidth >= BREAKPOINT) {
       resetInlineStyles();
       return;
     }
 
-    const scale = Math.pow(winWidth / BREAKPOINT, 1.2);
-    const width = 100 / scale;
-    const height = baseHeight / scale;
-    const offsetLeft = (width - 100) / 2;
+    const scale = Math.pow(containerWidth / BREAKPOINT, 1.2);
+    const widthPx = containerWidth / scale;
+    const heightPx = (containerWidth * (9 / 16)) / scale;
+    const offsetLeftPx = (widthPx - containerWidth) / 2;
 
-    iframe.style.cssText = `${transformStr({
-      scale,
-      translateX: `-${offsetLeft}%`,
-    })}; width: ${width}%; height: ${height}px;`;
+    iframe.style.cssText = [
+      transformStr({
+        scale,
+        translateX: `-${offsetLeftPx}px`,
+      }),
+      `width: ${widthPx}px`,
+      `height: ${heightPx}px`,
+    ].join("; ");
   }
 
   window.addEventListener("resize", onResize, false);
