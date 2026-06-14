@@ -78,7 +78,6 @@ function applyScaling(iframe) {
   function onResize() {
     const now = Date.now();
     const winWidth = window.innerWidth;
-    const noResizing = winWidth > BREAKPOINT;
 
     if (now - timestamp < THROTTLE) {
       return;
@@ -86,7 +85,7 @@ function applyScaling(iframe) {
 
     timestamp = now;
 
-    if (noResizing) {
+    if (winWidth > BREAKPOINT) {
       resetInlineStyles();
       return;
     }
