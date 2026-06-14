@@ -16,8 +16,7 @@
   margin: 0;
   border: 0;
   max-width: none;
-  width: auto;
-  height: auto;
   aspect-ratio: auto;
   will-change: transform;
+  backface-visibility: hidden;
 }
