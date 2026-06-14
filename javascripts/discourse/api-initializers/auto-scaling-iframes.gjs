@@ -64,7 +64,6 @@ function consumeAutoscaleMarker(iframe) {
 
 function applyScaling(iframe) {
   let timestamp = 0;
-  const container = iframe.closest(".cooked") || iframe.parentElement;
 
   function resetInlineStyles() {
     iframe.style.removeProperty("transform");
@@ -76,6 +75,8 @@ function applyScaling(iframe) {
 
   function onResize() {
     const now = Date.now();
+    const cooked = iframe.closest(".cooked");
+    const cookedWidth = cooked?.clientWidth;
 
     if (now - timestamp < THROTTLE) {
       return;
@@ -83,34 +84,32 @@ function applyScaling(iframe) {
 
     timestamp = now;
 
-    const containerWidth = container?.clientWidth || iframe.parentElement?.clientWidth;
-
-    if (!containerWidth) {
+    if (!cookedWidth) {
       return;
     }
 
-    if (containerWidth >= BREAKPOINT) {
+    if (cookedWidth >= BREAKPOINT) {
       resetInlineStyles();
       return;
     }
 
-    const scale = Math.pow(containerWidth / BREAKPOINT, 1.2);
-    const widthPx = containerWidth / scale;
-    const heightPx = (containerWidth * (9 / 16)) / scale;
-    const offsetLeftPx = (widthPx - containerWidth) / 2;
+    const scale = Math.pow(cookedWidth / BREAKPOINT, 1.2);
+    const width = 100 / scale;
+    const baseHeight = cookedWidth * (9 / 16);
+    const height = baseHeight / scale;
+    const offsetLeft = (width - 100) / 2;
 
-    iframe.style.cssText = [
-      transformStr({
+    iframe.setAttribute(
+      "style",
+      `${transformStr({
         scale,
-        translateX: `-${offsetLeftPx}px`,
-      }),
-      `width: ${widthPx}px`,
-      `height: ${heightPx}px`,
-    ].join("; ");
+        translateX: `-${offsetLeft}%`,
+      })}; width: ${width}%; height: ${height}px;`
+    );
   }
 
   window.addEventListener("resize", onResize, false);
-  onResize();
+  requestAnimationFrame(onResize);
 }
 
 export default apiInitializer((api) => {
