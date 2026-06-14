@@ -67,6 +67,7 @@ function wrapIframe(iframe) {
   const wrapper = document.createElement("div");
   wrapper.className = "autoscale-iframe-wrap";
 
+  iframe.classList.remove("responsive-iframe");
   iframe.classList.add("autoscale-iframe");
 
   iframe.parentNode.insertBefore(wrapper, iframe);
@@ -104,6 +105,7 @@ function attachScaling(wrapper, iframe) {
   }
 
   const resizeObserver = new ResizeObserver(() => {
+    iframe.classList.remove("responsive-iframe");
     updateScaledIframe(wrapper, iframe);
   });
 
@@ -121,6 +123,7 @@ export default apiInitializer((api) => {
           iframe.classList.contains("autoscale-iframe") ||
           iframe.parentElement?.classList.contains("autoscale-iframe-wrap")
         ) {
+          iframe.classList.remove("responsive-iframe");
           return;
         }
 
