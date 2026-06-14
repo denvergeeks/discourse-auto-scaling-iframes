@@ -1,2 +1,21 @@
-example_setting:
-  default: true
+desktop_width:
+  type: integer
+  default: 1440
+  min: 320
+  max: 3840
+
+aspect_ratio_width:
+  type: integer
+  default: 16
+  min: 1
+  max: 64
+
+aspect_ratio_height:
+  type: integer
+  default: 9
+  min: 1
+  max: 64
+
+iframe_border:
+  type: string
+  default: "1px solid #666"
