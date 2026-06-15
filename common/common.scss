@@ -1,5 +1,29 @@
 /* DISCOURSE AUTO-SCALING IFRAMES */
 
+/*
+.cooked .autoscale-iframe-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  border: #{$iframe_border};
+  box-sizing: border-box;
+}
+*/
+
+iframe.autoscale-iframe,
+iframe.autoscale-iframe.responsive-iframe {
+  display: block;
+  margin: 0;
+  border: 0;
+  max-width: none;
+  aspect-ratio: auto;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/*
 .cooked .autoscale-iframe-wrap {
   position: relative;
   width: 100%;
@@ -20,3 +44,4 @@
   will-change: transform;
   backface-visibility: hidden;
 }
+*/
