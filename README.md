@@ -36,16 +36,5 @@ The iframe will render inside a fixed visible viewport using the configured aspe
 - It is designed to coexist with a responsive iframe component by unwrapping `responsive-iframe-wrap` before applying autoscale behavior.
 - Resize observers are cleaned up when wrappers are removed from the DOM.
 
-## Compatibility
+<img width="576" height="797" alt="discourse-auto-scaling-iframes-theme-component" src="https://github.com/user-attachments/assets/7d01620e-8f51-4c63-be46-f78ac30d79a4" />
 
-Tested for self-hosted Discourse forums using current theme component patterns and `api.decorateCookedElement()`.
-
-## Installation
-
-Install as a remote theme component from this repository URL in:
-
-`/admin/config/customize/themes`
-
-## License
-
-MIT
