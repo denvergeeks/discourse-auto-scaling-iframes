@@ -16,7 +16,8 @@
   margin: 0;
   border: 0;
   max-width: none;
-  aspect-ratio: auto;
+  /* aspect-ratio: auto; */
+      aspect-ratio: 16 / 9 !important;
   will-change: transform;
   backface-visibility: hidden;
 }
