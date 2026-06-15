@@ -1,6 +1,6 @@
 # Discourse Auto-Scaling iFrames
 
-A Discourse theme component that adds an optional autoscaled desktop-style iframe mode for cooked post content.
+A Discourse theme component that adds an optional (miniaturized) desktop-style iframe mode for cooked post content that auto-scales with window resizing.
 
 When an iframe is immediately followed by an `{autoscale}` marker, the component:
 
@@ -9,7 +9,8 @@ When an iframe is immediately followed by an `{autoscale}` marker, the component
 - wraps the iframe in an `autoscale-iframe-wrap`,
 - scales the iframe down to fit the available cooked width,
 - preserves the configured visible aspect ratio,
-- and keeps the iframe visually aligned with the wrapper.
+- keeps the iframe visually aligned with the wrapper,
+- and, when a user resizes the window, autoscales the iFrame as well as the contents inside the iFrame.
 
 ## How it works
 
