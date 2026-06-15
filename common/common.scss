@@ -6,19 +6,26 @@
   max-width: 100%;
   overflow: hidden;
   line-height: 0;
+  box-sizing: border-box;
+}
+
+.cooked .autoscale-iframe-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
   border: #{$iframe_border};
+  pointer-events: none;
   box-sizing: border-box;
 }
 
 .cooked .autoscale-iframe-wrap > iframe.autoscale-iframe,
 .cooked .autoscale-iframe-wrap > iframe.autoscale-iframe.responsive-iframe {
   display: block;
+  vertical-align: top;
   margin: 0;
   border: 0;
   max-width: none;
-  /* aspect-ratio: auto; */
-     /* aspect-ratio: 16 / 9 !important; */
+  aspect-ratio: auto;
   will-change: transform;
   backface-visibility: hidden;
 }
-
