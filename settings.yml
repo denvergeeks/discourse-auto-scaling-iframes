@@ -1,21 +1,18 @@
 desktop_width:
-  type: integer
   default: 1440
   min: 320
   max: 3840
 
 aspect_ratio_width:
-  type: integer
   default: 16
   min: 1
   max: 64
 
 aspect_ratio_height:
-  type: integer
   default: 9
   min: 1
   max: 64
 
 iframe_border:
+  default: "1px solid var(--primary-low)"
   type: string
-  default: "1px solid #666"
