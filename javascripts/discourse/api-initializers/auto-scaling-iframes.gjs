@@ -1,6 +1,7 @@
 import { apiInitializer } from "discourse/lib/api";
 
 const resizeObservers = new WeakMap();
+const removalObservers = new WeakMap();
 
 function isAutoscaleText(value) {
   return value?.trim() === "{autoscale}";
@@ -13,7 +14,42 @@ function getDesktopWidth() {
 function getAspectRatioValues() {
   const width = Math.max(1, Number(settings.aspect_ratio_width) || 16);
   const height = Math.max(1, Number(settings.aspect_ratio_height) || 9);
+
   return { width, height };
+}
+
+function cleanupWrapper(wrapper) {
+  const resizeObserver = resizeObservers.get(wrapper);
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+    resizeObservers.delete(wrapper);
+  }
+
+  const removalObserver = removalObservers.get(wrapper);
+  if (removalObserver) {
+    removalObserver.disconnect();
+    removalObservers.delete(wrapper);
+  }
+}
+
+function watchWrapperRemoval(wrapper) {
+  if (removalObservers.has(wrapper)) {
+    return;
+  }
+
+  const parent = wrapper.parentNode;
+  if (!parent) {
+    return;
+  }
+
+  const removalObserver = new MutationObserver(() => {
+    if (!wrapper.isConnected) {
+      cleanupWrapper(wrapper);
+    }
+  });
+
+  removalObserver.observe(parent, { childList: true });
+  removalObservers.set(wrapper, removalObserver);
 }
 
 function consumeAutoscaleMarker(iframe) {
@@ -81,8 +117,8 @@ function wrapIframe(iframe) {
   }
 
   const cleanIframe = unwrapResponsiveIframe(iframe);
-
   const wrapper = document.createElement("div");
+
   wrapper.className = "autoscale-iframe-wrap";
 
   cleanIframe.classList.remove("responsive-iframe");
@@ -109,8 +145,8 @@ function updateScaledIframe(wrapper, iframe) {
     wrapper.style.height = `${desktopHeight}px`;
     iframe.style.width = "100%";
     iframe.style.height = `${desktopHeight}px`;
-    iframe.style.transform = "";
-    iframe.style.transformOrigin = "";
+    iframe.style.transform = "none";
+    iframe.style.transformOrigin = "top left";
     return;
   }
 
@@ -141,6 +177,7 @@ function attachScaling(wrapper, iframe) {
   resizeObserver.observe(wrapper);
   resizeObservers.set(wrapper, resizeObserver);
 
+  watchWrapperRemoval(wrapper);
   updateScaledIframe(wrapper, iframe);
 }
 
@@ -161,13 +198,12 @@ export default apiInitializer((api) => {
         }
 
         const wrapper = wrapIframe(iframe);
-        const autoscaleIframe = wrapper.querySelector("iframe");
 
-        if (!autoscaleIframe) {
+        if (!(wrapper instanceof HTMLElement)) {
           return;
         }
 
-        attachScaling(wrapper, autoscaleIframe);
+        attachScaling(wrapper, iframe);
       });
     },
     { id: "auto-scaling-iframes" }
