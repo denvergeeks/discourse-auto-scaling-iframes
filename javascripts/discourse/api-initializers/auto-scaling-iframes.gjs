@@ -116,8 +116,8 @@ function updateScaledIframe(wrapper, iframe) {
 
   const scale = Math.pow(wrapperWidth / desktopWidth, 1.2);
   const compensatedWidthPercent = 100 / scale;
-  const compensatedHeightPx = desktopHeight / scale;
   const visibleHeight = wrapperWidth * (aspect.height / aspect.width);
+  const compensatedHeightPx = visibleHeight / scale;
 
   wrapper.style.height = `${visibleHeight}px`;
 
