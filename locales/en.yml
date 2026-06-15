@@ -1,8 +1,8 @@
 en:
   theme_metadata:
-    description: "Shrinks marked iframes into desktop-style previews inside topic posts."
+    description: "Adds an optional autoscaled desktop-style iframe mode for cooked post iframes using an {autoscale} marker."
     settings:
-      desktop_width: "The virtual desktop width, in pixels, used for iframe preview scaling. Larger values show more of the embedded page but make it appear smaller."
-      aspect_ratio_width: "The width portion of the iframe aspect ratio. Use 16 for a 16:9 preview, 4 for 4:3, and so on."
-      aspect_ratio_height: "The height portion of the iframe aspect ratio. Use 9 for a 16:9 preview, 3 for 4:3, and so on."
-      iframe_border: "CSS border value applied to the iframe preview wrapper, for example: 1px solid #666"
+      desktop_width: "Virtual desktop width used as the iframe's unscaled layout width before autoscaling."
+      aspect_ratio_width: "Visible autoscaled iframe viewport aspect-ratio width."
+      aspect_ratio_height: "Visible autoscaled iframe viewport aspect-ratio height."
+      iframe_border: "Border painted as an overlay on the autoscaled iframe wrapper."
