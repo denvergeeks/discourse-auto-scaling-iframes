@@ -1,117 +1,51 @@
-# Discourse Auto-Scaling Iframes
+# Discourse Auto-Scaling iFrames
 
-A Discourse theme component that turns marked iframes in cooked post content into desktop-style scaled previews.
+A Discourse theme component that adds an optional autoscaled desktop-style iframe mode for cooked post content.
 
-When an iframe is immediately followed by `{autoscale}`, the component:
+When an iframe is immediately followed by an `{autoscale}` marker, the component:
 
-- removes the `{autoscale}` marker,
-- wraps the iframe in a clipping container,
-- renders the iframe at a fixed virtual desktop width,
-- scales it down to fit the width of the post content.
-
-This allows a full desktop page to remain visible inside the iframe instead of showing only a narrow mobile-sized slice.
-
-## Installation
-
-1. In Discourse, go to **Admin → Appearance → Themes & components**. [web:180]
-2. Install this repository as a **theme component** from its Git URL, or upload it locally. [web:180]
-3. Add the component to the active theme using **Included components** or the component’s **Include component on these themes** setting. [web:180]
-
-## Usage
-
-In a post, place `{autoscale}` immediately after the iframe:
-
-```html
-<iframe src="https://example.com"></iframe>
-{autoscale}
-```
-
-Only iframes followed by `{autoscale}` are modified. All other iframes are left alone.
+- removes the marker from cooked content,
+- unwraps any existing `responsive-iframe-wrap`,
+- wraps the iframe in an `autoscale-iframe-wrap`,
+- scales the iframe down to fit the available cooked width,
+- preserves the configured visible aspect ratio,
+- and keeps the iframe visually aligned with the wrapper.
 
 ## How it works
 
-The component uses Discourse’s cooked-post decoration API to scan rendered post HTML and find marked iframes. The callback receives the post root element, which allows the component to safely inspect and modify the cooked content after rendering. [web:179][web:12]
+Add an iframe to a post, then place `{autoscale}` immediately after it.
 
-For each marked iframe, the component wraps it in a container that stays at 100% width of the `.cooked` content area. The iframe itself is given a fixed “desktop canvas” width and then scaled with CSS transforms so the full embedded page is visible inside the wrapper. This wrapper-based scaling pattern is the clean way to make oversized iframe content fit a smaller responsive container. [web:53][web:107]
-
-## Theme settings
-
-The component includes the following theme settings:
-
-- `desktop_width` — the virtual desktop width in pixels used before scaling.
-- `aspect_ratio_width` — the width part of the preview ratio.
-- `aspect_ratio_height` — the height part of the preview ratio.
-- `iframe_border` — the CSS border applied to the wrapper.
-
-### Recommended defaults
-
-- `desktop_width`: `1440`
-- `aspect_ratio_width`: `16`
-- `aspect_ratio_height`: `9`
-
-### Tuning guidance
-
-- Increase `desktop_width` to show more of the embedded site at once, but the preview will become smaller.
-- Decrease `desktop_width` to make the embedded site larger and easier to read.
-- Change the aspect ratio if your embedded content is better suited to `4:3`, `3:2`, or an ultrawide layout.
-
-## Example
+Example:
 
 ```html
-<iframe src="https://blog.discourse.org/"></iframe>
-{autoscale}
+<iframe src="https://blog.discourse.org/"></iframe>{autoscale}
 ```
 
-With default settings, the iframe is rendered as a 1440px-wide desktop preview and scaled down to fit the topic post width.
+The iframe will render inside a fixed visible viewport using the configured aspect ratio, while its internal content is scaled to simulate a desktop-width preview.
 
-## Limitations
+## Settings
 
-### Iframe permissions
+- `desktop_width`: The virtual desktop width used before scaling.
+- `aspect_ratio_width`: Visible viewport aspect-ratio width.
+- `aspect_ratio_height`: Visible viewport aspect-ratio height.
+- `iframe_border`: Border applied as a non-layout overlay on the wrapper.
 
-This component cannot bypass `X-Frame-Options` or `Content-Security-Policy` restrictions set by the remote site. If a site blocks iframe embedding, the preview will not load regardless of the theme component. Discourse also maintains iframe-related security restrictions in core. [web:83]
+## Notes
 
-### Marker placement
+- This component is intended for cooked post content.
+- It is designed to coexist with a responsive iframe component by unwrapping `responsive-iframe-wrap` before applying autoscale behavior.
+- Resize observers are cleaned up when wrappers are removed from the DOM.
 
-The `{autoscale}` marker must appear immediately after the iframe in the cooked post content for the component to detect it correctly.
+## Compatibility
 
-This works:
+Tested for self-hosted Discourse forums using current theme component patterns and `api.decorateCookedElement()`.
 
-```html
-<iframe src="https://example.com"></iframe>
-{autoscale}
-```
+## Installation
 
-This may not work:
+Install as a remote theme component from this repository URL in:
 
-```html
-<iframe src="https://example.com"></iframe>
+`/admin/config/customize/themes`
 
-Some other text here
+## License
 
-{autoscale}
-```
-
-### Readability tradeoff
-
-A full desktop-page preview is useful for visual context, but small text inside the embedded page may become hard to read at narrower post widths. In those cases, lower the `desktop_width` setting.
-
-## Technical notes
-
-- Built as a **theme component**, not a plugin, because this is purely frontend behavior applied to cooked post content. [web:177][web:178]
-- Uses `api.decorateCookedElement(...)`, which is the supported JS API approach for altering cooked post HTML in themes. [web:12][web:179]
-- Uses `ResizeObserver` so scaling updates when the post container changes width, not only when the browser window resizes. [web:122]
-
-## File structure
-
-Relevant files in this component:
-
-- `settings.yml`
-- `locales/en.yml`
-- `common/common.scss`
-- `javascripts/discourse/api-initializers/auto-scaling-iframes.gjs`
-
-This aligns with the standard structure for Discourse themes and theme components. [web:13][web:118]
-
-## Support
-
-This component is intended for self-hosted Discourse forums where staff want a lightweight way to embed desktop-style previews inside posts without building a plugin.
+MIT
